@@ -4,6 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	channelhttp "github.com/beruangcoklat/live-chat/channel/delivery/http"
+	channelrepository "github.com/beruangcoklat/live-chat/channel/repository"
+	channelusecase "github.com/beruangcoklat/live-chat/channel/usecase"
 	chathttp "github.com/beruangcoklat/live-chat/chat/delivery/http"
 	chatkafka "github.com/beruangcoklat/live-chat/chat/delivery/kafka"
 	chatrepository "github.com/beruangcoklat/live-chat/chat/repository"
@@ -16,8 +19,11 @@ import (
 )
 
 var (
-	chatRepo domain.ChatRepository
-	chatUc   domain.ChatUsecase
+	chatRepo    domain.ChatRepository
+	channelRepo domain.ChannelRepository
+
+	chatUc    domain.ChatUsecase
+	channelUc domain.ChannelUsecase
 
 	cassandraSession *gocql.Session
 	kafkaWriter      *kafka.Writer
@@ -47,10 +53,12 @@ func initKafka() {
 
 func initRepo() {
 	chatRepo = chatrepository.New(cassandraSession, kafkaWriter)
+	channelRepo = channelrepository.New(cassandraSession)
 }
 
 func initUsecase() {
 	chatUc = chatusecase.New(chatRepo)
+	channelUc = channelusecase.New(channelRepo)
 }
 
 func main() {
@@ -79,6 +87,7 @@ func main() {
 
 	router := mux.NewRouter()
 	chathttp.New(router, chatUc)
+	channelhttp.New(router, channelUc)
 	chatkafka.New(chatUc)
 
 	port := config.GetConfig().Port

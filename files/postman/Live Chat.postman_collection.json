@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "Get",
+			"name": "Get Chat",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -37,7 +37,7 @@
 			"response": []
 		},
 		{
-			"name": "Post",
+			"name": "Post Chat",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -57,6 +57,23 @@
 					],
 					"path": [
 						"chat"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Channel",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/channel",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"channel"
 					]
 				}
 			},

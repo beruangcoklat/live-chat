@@ -6,8 +6,7 @@ drop table if exists channel;
 create table channel (
     id uuid,
     name text,
-    created_at bigint,
-    primary key(id, created_at)
+    primary key(id)
 );
 
 drop table if exists chat;
@@ -19,5 +18,5 @@ create table chat (
     primary key(channel_id, created_at)
 );
 
-insert into channel (id, name, created_at) values (uuid(), 'channel 1',  unixTimestampOf(now()));
-insert into channel (id, name, created_at) values (uuid(), 'channel 2',  unixTimestampOf(now()));
+insert into channel (id, name) values (uuid(), 'channel 1');
+insert into channel (id, name) values (uuid(), 'channel 2');
