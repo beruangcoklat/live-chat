@@ -1,0 +1,66 @@
+{
+	"info": {
+		"_postman_id": "71b8d23c-5313-47b2-8abe-72f354e6c7cd",
+		"name": "Live Chat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/chat?limit=12&created_at=1634799699714&channel_id=8826dfc9-a1b2-4e35-aa0b-60936ccc1830",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"chat"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "12"
+						},
+						{
+							"key": "created_at",
+							"value": "1634799699714"
+						},
+						{
+							"key": "channel_id",
+							"value": "8826dfc9-a1b2-4e35-aa0b-60936ccc1830"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"channel_id\": \"8826dfc9-a1b2-4e35-aa0b-60936ccc1830\",\n  \"sender\": \"budi\",\n  \"message\": \"data 3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/chat",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"chat"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
