@@ -7,15 +7,25 @@ import (
 
 type (
 	ChatUsecase interface {
-		NewClient(ctx context.Context, r http.ResponseWriter, groupID int64)
-		CloseClient(ctx context.Context, r http.ResponseWriter)
+		NewClient(ctx context.Context, r http.ResponseWriter, groupID string)
+		CloseClient(ctx context.Context, r http.ResponseWriter, groupID string)
 		Post(ctx context.Context, chat Chat) error
+		Get(ctx context.Context, channelID string, createdAt int64, limit int) ([]Chat, error)
+		Broadcast(ctx context.Context, chat Chat)
+	}
+
+	ChatRepository interface {
+		Get(ctx context.Context, channelID string, createdAt int64, limit int) ([]Chat, error)
+		Create(ctx context.Context, chat Chat) error
+		Publish(ctx context.Context, chat Chat) error
 	}
 )
 
 type (
 	Chat struct {
-		GroupID int64  `json:"group_id"`
-		Message string `json:"message"`
+		ChannelID string `json:"channel_id"`
+		Sender    string `json:"sender"`
+		Message   string `json:"message"`
+		CreatedAt int64  `json:"created_at"`
 	}
 )

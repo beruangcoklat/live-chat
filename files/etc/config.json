@@ -1,3 +1,10 @@
 {
-    "port" : "8080"
+    "port": "8080",
+    "cassandra_username": "cassandra",
+    "cassandra_password": "cassandra",
+    "cassandra_keyspace": "live_chat",
+    "cassandra_cluster": "localhost",
+    "kafka_broker": [
+        "localhost:29092"
+    ]
 }

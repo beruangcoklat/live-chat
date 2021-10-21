@@ -1,2 +1,2 @@
-gorun-http:
-	@go run app/*.go --app=http
+gorun:
+	@go run app/*.go
