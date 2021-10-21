@@ -5,6 +5,7 @@ import {
   Route
 } from "react-router-dom";
 import ChatRoomPage from './pages/chat_room/index'
+import ChannelListPage from './pages/channel_list/index'
 
 function App() {
   return (
@@ -17,8 +18,11 @@ function App() {
         }}>
 
           <Switch>
-            <Route path="/">
+            <Route path="/chat/:channel_id">
               <ChatRoomPage />
+            </Route>
+            <Route path="/">
+              <ChannelListPage />
             </Route>
           </Switch>
         </div>
