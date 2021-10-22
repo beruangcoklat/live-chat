@@ -3,8 +3,8 @@
     "cassandra_username": "cassandra",
     "cassandra_password": "cassandra",
     "cassandra_keyspace": "live_chat",
-    "cassandra_cluster": "localhost",
+    "cassandra_cluster": "cassandra",
     "kafka_broker": [
-        "localhost:29092"
+        "kafka:29092"
     ]
 }

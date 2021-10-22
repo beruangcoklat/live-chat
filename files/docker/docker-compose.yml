@@ -1,0 +1,52 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: ./../../.
+      dockerfile: ./files/docker/Dockerfile
+    volumes:
+      - ./../etc/config.json:/etc/live-chat/config.json
+    depends_on:
+      cassandra:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  cassandra:
+    image: docker.io/bitnami/cassandra:4.0
+    environment:
+      - CASSANDRA_SEEDS=cassandra
+      - CASSANDRA_PASSWORD_SEEDER=yes
+      - CASSANDRA_PASSWORD=cassandra
+    volumes:
+      - ./../db/schema.cql:/scripts/schema.cql
+    healthcheck:
+      test: ["CMD", "cqlsh", "-u", "cassandra", "-p" ,"cassandra" ,"-f", "/scripts/schema.cql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "/usr/bin/kafka-topics", "--create", "--topic", "chat", "--replication-factor", "1", "--partitions", "1", "--zookeeper", "zookeeper:2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
