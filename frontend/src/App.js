@@ -1,4 +1,5 @@
 import './App.css';
+import { useEffect } from 'react'
 import {
   BrowserRouter as Router,
   Switch,
@@ -8,11 +9,18 @@ import ChatRoomPage from './pages/chat_room/index'
 import ChannelListPage from './pages/channel_list/index'
 
 function App() {
+
+  useEffect(() => {
+    if (localStorage.getItem('username') === null) {
+      localStorage.setItem('username', prompt('Input Username'))
+    }
+  }, [])
+
   return (
     <>
       <Router>
         <div style={{
-          width: '50%',
+          width: '80%',
           margin: 'auto',
           marginTop: '20px',
         }}>

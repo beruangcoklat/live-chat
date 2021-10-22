@@ -42,7 +42,7 @@ export default function ChatRoomPage(props) {
 
     const payload = {
       channel_id: params.channel_id,
-      sender: 'budi',
+      sender: localStorage.getItem('username'),
       message: msg,
     }
 
