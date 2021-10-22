@@ -5,6 +5,6 @@
     "cassandra_keyspace": "live_chat",
     "cassandra_cluster": "cassandra",
     "kafka_broker": [
-        "kafka:29092"
+        "kafka-broker:29092"
     ]
 }

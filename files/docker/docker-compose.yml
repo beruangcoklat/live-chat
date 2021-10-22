@@ -9,10 +9,11 @@ services:
     depends_on:
       cassandra:
         condition: service_healthy
-      kafka:
+      kafka-broker:
         condition: service_healthy
     ports:
       - "8080:8080"
+    restart: always
 
   cassandra:
     image: docker.io/bitnami/cassandra:4.0
@@ -20,13 +21,20 @@ services:
       - CASSANDRA_SEEDS=cassandra
       - CASSANDRA_PASSWORD_SEEDER=yes
       - CASSANDRA_PASSWORD=cassandra
-    volumes:
-      - ./../db/schema.cql:/scripts/schema.cql
     healthcheck:
-      test: ["CMD", "cqlsh", "-u", "cassandra", "-p" ,"cassandra" ,"-f", "/scripts/schema.cql"]
+      test: ["CMD", "cqlsh", "-u", "cassandra", "-p" ,"cassandra" ,"-e", "describe keyspaces"]
       interval: 30s
       timeout: 10s
       retries: 5
+
+  cassandra-init:
+    image: docker.io/bitnami/cassandra:4.0
+    volumes:
+      - ./../db/schema.cql:/scripts/schema.cql
+    command: /bin/bash -c "echo loading cassandra keyspace && cqlsh cassandra -u cassandra -p cassandra -f /scripts/schema.cql"
+    depends_on:
+      cassandra:
+        condition: service_healthy
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -34,19 +42,25 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
   
-  kafka:
+  kafka-broker:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     healthcheck:
-      test: ["CMD", "/usr/bin/kafka-topics", "--create", "--topic", "chat", "--replication-factor", "1", "--partitions", "1", "--zookeeper", "zookeeper:2181"]
+      test: ["CMD", "/usr/bin/kafka-topics", "--list", "--zookeeper", "zookeeper:2181"]
       interval: 30s
       timeout: 10s
       retries: 5
+
+  kafka-init:
+    image: confluentinc/cp-kafka:latest
+    command: /usr/bin/kafka-topics --create --topic chat --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
+    depends_on:
+      - zookeeper
