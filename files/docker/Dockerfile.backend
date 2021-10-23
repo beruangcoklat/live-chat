@@ -1,6 +1,10 @@
-FROM golang:1.17
+FROM golang:1.17 as gobuild
 WORKDIR /app
 COPY . .
 RUN go mod vendor
 RUN go build -o live-chat app/*.go
+
+FROM ubuntu:16.04
+WORKDIR /app
+COPY --from=gobuild /app/live-chat .
 ENTRYPOINT [ "/app/live-chat" ]

@@ -1,9 +1,19 @@
 version: "3"
 services:
+  frontend:
+    build:
+      context: ./../../.
+      dockerfile: ./files/docker/Dockerfile.frontend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    restart: always
+
   backend:
     build:
       context: ./../../.
-      dockerfile: ./files/docker/Dockerfile
+      dockerfile: ./files/docker/Dockerfile.backend
     volumes:
       - ./../etc/config.json:/etc/live-chat/config.json
     depends_on:
@@ -11,8 +21,6 @@ services:
         condition: service_healthy
       kafka-broker:
         condition: service_healthy
-    ports:
-      - "8080:8080"
     restart: always
 
   cassandra:
@@ -49,18 +57,13 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:9092,PLAINTEXT_HOST://kafka-broker:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "chat"
     healthcheck:
       test: ["CMD", "/usr/bin/kafka-topics", "--list", "--zookeeper", "zookeeper:2181"]
       interval: 30s
       timeout: 10s
       retries: 5
-
-  kafka-init:
-    image: confluentinc/cp-kafka:latest
-    command: /usr/bin/kafka-topics --create --topic chat --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
-    depends_on:
-      - zookeeper
